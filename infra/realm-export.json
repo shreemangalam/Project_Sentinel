@@ -302,6 +302,7 @@
       ],
       "security-admin-console": [],
       "admin-cli": [],
+      "sentinel-test": [],
       "account-console": [],
       "broker": [
         {
@@ -632,7 +633,8 @@
       "protocol": "openid-connect",
       "attributes": {
         "realm_client": "false",
-        "client.use.lightweight.access.token.enabled": "true"
+        "client.use.lightweight.access.token.enabled": "true",
+        "post.logout.redirect.uris": "+"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
@@ -674,7 +676,8 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
-        "realm_client": "true"
+        "realm_client": "true",
+        "post.logout.redirect.uris": "+"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
@@ -716,7 +719,8 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
-        "realm_client": "true"
+        "realm_client": "true",
+        "post.logout.redirect.uris": "+"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
@@ -805,6 +809,67 @@
         "offline_access",
         "microprofile-jwt"
       ]
+    },
+    {
+      "id": "eaca567e-4c76-42a8-b71f-533c14e19d8f",
+      "clientId": "sentinel-test",
+      "description": "Test client for obtaining tokens via password grant locally",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "redirectUris": [],
+      "webOrigins": [],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "protocolMappers": [
+        {
+          "id": "57912c48-ed4f-43bc-8b8f-51f94b783717",
+          "name": "group-membership-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true",
+            "multivalued": "true"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "organization",
+        "offline_access",
+        "microprofile-jwt"
+      ]
     }
   ],
   "clientScopes": [
@@ -845,8 +910,9 @@
           "consentRequired": false,
           "config": {
             "user.session.note": "AUTH_TIME",
-            "id.token.claim": "true",
             "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
             "access.token.claim": "true",
             "claim.name": "auth_time",
             "jsonType.label": "long"
@@ -1093,12 +1159,13 @@
           "protocolMapper": "oidc-organization-membership-mapper",
           "consentRequired": false,
           "config": {
-            "id.token.claim": "true",
             "introspection.token.claim": "true",
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
             "access.token.claim": "true",
             "claim.name": "organization",
-            "jsonType.label": "String",
-            "multivalued": "true"
+            "jsonType.label": "String"
           }
         }
       ]
@@ -1372,6 +1439,7 @@
           "config": {
             "introspection.token.claim": "true",
             "multivalued": "true",
+            "userinfo.token.claim": "true",
             "user.attribute": "foo",
             "id.token.claim": "true",
             "access.token.claim": "true",
@@ -1400,7 +1468,8 @@
           "config": {
             "id.token.claim": "true",
             "introspection.token.claim": "true",
-            "access.token.claim": "true"
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
           }
         }
       ]
@@ -1489,14 +1558,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
-            "saml-user-property-mapper",
-            "oidc-full-name-mapper",
             "saml-role-list-mapper",
-            "saml-user-attribute-mapper",
             "oidc-usermodel-property-mapper",
+            "oidc-address-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-full-name-mapper",
             "oidc-usermodel-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper"
+            "saml-user-attribute-mapper",
+            "saml-user-property-mapper"
           ]
         }
       },
@@ -1563,14 +1632,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-full-name-mapper",
+            "oidc-address-mapper",
+            "saml-user-attribute-mapper",
             "oidc-usermodel-attribute-mapper",
             "saml-user-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-property-mapper",
+            "oidc-full-name-mapper",
             "saml-role-list-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-address-mapper"
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-property-mapper"
           ]
         }
       }
@@ -1601,10 +1670,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1624,11 +1693,11 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "read.only": [
-                  "true"
-                ],
                 "always.read.value.from.ldap": [
                   "false"
+                ],
+                "read.only": [
+                  "true"
                 ],
                 "user.model.attribute": [
                   "email"
@@ -1647,10 +1716,10 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1670,10 +1739,10 @@
                 "is.mandatory.in.ldap": [
                   "false"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1693,11 +1762,11 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
-                  "false"
-                ],
                 "read.only": [
                   "true"
+                ],
+                "always.read.value.from.ldap": [
+                  "false"
                 ],
                 "user.model.attribute": [
                   "username"
@@ -1733,14 +1802,14 @@
                 "group.name.ldap.attribute": [
                   "cn"
                 ],
-                "membership.user.ldap.attribute": [
-                  "uid"
+                "ignore.missing.groups": [
+                  "false"
                 ],
                 "membership.ldap.attribute": [
                   "member"
                 ],
-                "ignore.missing.groups": [
-                  "false"
+                "membership.user.ldap.attribute": [
+                  "uid"
                 ],
                 "preserve.group.inheritance": [
                   "true"
@@ -1748,11 +1817,11 @@
                 "groups.dn": [
                   "ou=groups,dc=sentinel,dc=local"
                 ],
-                "group.object.classes": [
-                  "groupOfNames"
-                ],
                 "memberof.ldap.attribute": [
                   "memberOf"
+                ],
+                "group.object.classes": [
+                  "groupOfNames"
                 ],
                 "drop.non.existing.groups.during.sync": [
                   "false"
@@ -1774,10 +1843,10 @@
                 "is.mandatory.in.ldap": [
                   "true"
                 ],
-                "always.read.value.from.ldap": [
+                "read.only": [
                   "true"
                 ],
-                "read.only": [
+                "always.read.value.from.ldap": [
                   "true"
                 ],
                 "user.model.attribute": [
@@ -1788,11 +1857,11 @@
           ]
         },
         "config": {
-          "pagination": [
-            "false"
-          ],
           "fullSyncPeriod": [
             "-1"
+          ],
+          "pagination": [
+            "false"
           ],
           "startTls": [
             "false"
@@ -1818,17 +1887,17 @@
           "changedSyncPeriod": [
             "-1"
           ],
+          "usernameLDAPAttribute": [
+            "uid"
+          ],
           "bindCredential": [
             "${env.LDAP_ADMIN_PASSWORD:admin}"
           ],
           "bindDn": [
             "cn=admin,dc=sentinel,dc=local"
           ],
-          "usernameLDAPAttribute": [
-            "uid"
-          ],
           "lastSync": [
-            "1784462184"
+            "1784553116"
           ],
           "vendor": [
             "ad"
@@ -1836,11 +1905,11 @@
           "uuidLDAPAttribute": [
             "entryUUID"
           ],
-          "allowKerberosAuthentication": [
-            "false"
-          ],
           "connectionUrl": [
             "ldap://ldap-server:389"
+          ],
+          "allowKerberosAuthentication": [
+            "false"
           ],
           "syncRegistrations": [
             "true"
@@ -2671,8 +2740,12 @@
     "cibaExpiresIn": "120",
     "cibaAuthRequestedUserHint": "login_hint",
     "oauth2DeviceCodeLifespan": "600",
+    "clientOfflineSessionMaxLifespan": "0",
     "oauth2DevicePollingInterval": "5",
+    "clientSessionIdleTimeout": "0",
     "parRequestUriLifespan": "60",
+    "clientSessionMaxLifespan": "0",
+    "clientOfflineSessionIdleTimeout": "0",
     "cibaInterval": "5",
     "realmReusableOtpCode": "false"
   },
