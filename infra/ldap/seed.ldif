@@ -1,0 +1,51 @@
+# Organizational Units
+dn: ou=people,dc=sentinel,dc=local
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=sentinel,dc=local
+objectClass: organizationalUnit
+ou: groups
+
+# Users
+dn: uid=shree.admin,ou=people,dc=sentinel,dc=local
+objectClass: inetOrgPerson
+uid: shree.admin
+cn: Shree Admin
+sn: Admin
+mail: shree.admin@sentinel.local
+userPassword: password123
+
+dn: uid=rishabh.user,ou=people,dc=sentinel,dc=local
+objectClass: inetOrgPerson
+uid: rishabh.user
+cn: Rishabh User
+sn: User
+mail: rishabh.user@sentinel.local
+userPassword: password123
+
+dn: uid=aman.user,ou=people,dc=sentinel,dc=local
+objectClass: inetOrgPerson
+uid: aman.user
+cn: Aman User
+sn: User
+mail: aman.user@sentinel.local
+userPassword: password123
+
+# Groups
+dn: cn=finance-admins,ou=groups,dc=sentinel,dc=local
+objectClass: groupOfNames
+cn: finance-admins
+member: uid=shree.admin,ou=people,dc=sentinel,dc=local
+
+dn: cn=employees,ou=groups,dc=sentinel,dc=local
+objectClass: groupOfNames
+cn: employees
+member: uid=shree.admin,ou=people,dc=sentinel,dc=local
+member: uid=rishabh.user,ou=people,dc=sentinel,dc=local
+member: uid=aman.user,ou=people,dc=sentinel,dc=local
+
+dn: cn=hr-admins,ou=groups,dc=sentinel,dc=local
+objectClass: groupOfNames
+cn: hr-admins
+member: uid=rishabh.user,ou=people,dc=sentinel,dc=local
