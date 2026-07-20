@@ -44,3 +44,8 @@ cn: employees
 member: uid=shree.admin,ou=people,dc=sentinel,dc=local
 member: uid=rishabh.user,ou=people,dc=sentinel,dc=local
 member: uid=aman.user,ou=people,dc=sentinel,dc=local
+
+dn: cn=hr-admins,ou=groups,dc=sentinel,dc=local
+objectClass: groupOfNames
+cn: hr-admins
+member: uid=rishabh.user,ou=people,dc=sentinel,dc=local
