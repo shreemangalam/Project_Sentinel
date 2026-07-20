@@ -31,13 +31,11 @@ public class CorrelationIdFilter implements WebFilter {
         final String finalCorrelationId = correlationId;
         exchange.getResponse().getHeaders().add(CORRELATION_ID_HEADER, finalCorrelationId);
 
-        // Mutate the request to ensure it gets passed downstream to finance-service
-        ServerWebExchange mutatedExchange = exchange.mutate()
-                .request(r -> r.header(CORRELATION_ID_HEADER, finalCorrelationId))
-                .build();
+        // DO NOT MUTATE THE REQUEST HERE! It breaks TokenRelay due to ReadOnlyHttpHeaders bug in Spring 6.1
+        // We will mutate it via CorrelationIdGlobalFilter right before routing.
 
         // Put it in Reactor context so SLF4J MDC can pick it up if configured
-        return chain.filter(mutatedExchange)
+        return chain.filter(exchange)
                 .contextWrite(ctx -> ctx.put(CORRELATION_ID_HEADER, finalCorrelationId));
     }
 }

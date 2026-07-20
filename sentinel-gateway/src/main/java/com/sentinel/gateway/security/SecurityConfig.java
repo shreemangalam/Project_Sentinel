@@ -52,6 +52,7 @@ public class SecurityConfig {
             )
             .oauth2Login(oauth2 -> {}) // default configuration
             .logout(logout -> logout
+                .requiresLogout(org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers(org.springframework.http.HttpMethod.GET, "/logout"))
                 .logoutSuccessHandler(logoutSuccessHandler)
             )
             .csrf(csrf -> csrf.disable()); // CSRF is mitigated by SameSite=Lax and no direct mutative endpoints on gateway itself
