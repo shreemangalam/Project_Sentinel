@@ -29,13 +29,14 @@ import org.slf4j.MDC;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private final RedirectServerAuthenticationEntryPoint defaultEntryPoint = 
         new RedirectServerAuthenticationEntryPoint("/oauth2/authorization/keycloak");
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, 
-                                                            ReactiveClientRegistrationRepository clientRegistrationRepository) {
+                                                            ReactiveClientRegistrationRepository clientRegistrationRepository,
+                                                            ObjectMapper objectMapper) {
         
         OidcClientInitiatedServerLogoutSuccessHandler logoutSuccessHandler = 
             new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
@@ -47,7 +48,7 @@ public class SecurityConfig {
                 .anyExchange().authenticated()
             )
             .exceptionHandling(exceptionHandling -> exceptionHandling
-                .authenticationEntryPoint(customAuthenticationEntryPoint())
+                .authenticationEntryPoint(customAuthenticationEntryPoint(objectMapper))
             )
             .oauth2Login(oauth2 -> {}) // default configuration
             .logout(logout -> logout
@@ -67,7 +68,7 @@ public class SecurityConfig {
         return resolver;
     }
 
-    private ServerAuthenticationEntryPoint customAuthenticationEntryPoint() {
+    private ServerAuthenticationEntryPoint customAuthenticationEntryPoint(ObjectMapper objectMapper) {
         return (exchange, ex) -> {
             HttpHeaders headers = exchange.getRequest().getHeaders();
             boolean isXhr = "XMLHttpRequest".equals(headers.getFirst("X-Requested-With")) ||
@@ -96,6 +97,7 @@ public class SecurityConfig {
                         byte[] bytes = objectMapper.writeValueAsBytes(problem);
                         return bufferFactory.wrap(bytes);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         return bufferFactory.wrap(new byte[0]);
                     }
                 }));
