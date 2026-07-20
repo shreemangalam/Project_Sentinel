@@ -1,0 +1,85 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: sentinel-gateway
+    
+  session:
+    store-type: redis
+    redis:
+      namespace: sentinel:session
+      
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+      password: ${REDIS_PASSWORD:redispassword}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: sentinel-gateway
+            client-secret: ${GATEWAY_CLIENT_SECRET:gateway-secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid, profile, email, roles
+        provider:
+          keycloak:
+            # Browser redirects here for login
+            authorization-uri: http://localhost:8080/realms/Sentinel/protocol/openid-connect/auth
+            # Gateway uses internal DNS for token exchange and JWKS
+            token-uri: http://keycloak:8080/realms/Sentinel/protocol/openid-connect/token
+            jwk-set-uri: http://keycloak:8080/realms/Sentinel/protocol/openid-connect/certs
+            user-info-uri: http://keycloak:8080/realms/Sentinel/protocol/openid-connect/userinfo
+            # We don't use issuer-uri here to avoid the auto-discovery split-horizon issue,
+            # but we will manually validate it if necessary (though the resource server cares more)
+            user-name-attribute: preferred_username
+
+  cloud:
+    gateway:
+      routes:
+        - id: finance-service
+          uri: ${FINANCE_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/finance/**
+          filters:
+            - TokenRelay=
+            - RemoveRequestHeader=Cookie
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.springframework.cloud.gateway: INFO
+    com.sentinel.gateway: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  data:
+    redis:
+      host: redis
+  cloud:
+    gateway:
+      routes:
+        - id: finance-service
+          uri: http://finance-service:8081
+          predicates:
+            - Path=/api/finance/**
+          filters:
+            - TokenRelay=
+            - RemoveRequestHeader=Cookie

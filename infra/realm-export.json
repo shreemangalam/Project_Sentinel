@@ -301,6 +301,7 @@
         }
       ],
       "security-admin-console": [],
+      "sentinel-gateway": [],
       "admin-cli": [],
       "sentinel-test": [],
       "account-console": [],
@@ -811,6 +812,47 @@
       ]
     },
     {
+      "id": "43c427ae-77fb-4027-9865-0f2c92088f8b",
+      "clientId": "sentinel-gateway",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${env.GATEWAY_CLIENT_SECRET:gateway-secret}",
+      "redirectUris": [
+        "http://localhost:8081/login/oauth2/code/keycloak"
+      ],
+      "webOrigins": [
+        "http://localhost:8081"
+      ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "realm_client": "false",
+        "post.logout.redirect.uris": "http://localhost:8081/"
+      },
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "sentinel-groups-scope",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": []
+    },
+    {
       "id": "eaca567e-4c76-42a8-b71f-533c14e19d8f",
       "clientId": "sentinel-test",
       "description": "Test client for obtaining tokens via password grant locally",
@@ -833,6 +875,7 @@
       "attributes": {
         "realm_client": "false",
         "backchannel.logout.session.required": "true",
+        "post.logout.redirect.uris": "+",
         "backchannel.logout.revoke.offline.tokens": "false"
       },
       "authenticationFlowBindingOverrides": {},
@@ -940,6 +983,28 @@
         "consent.screen.text": "${offlineAccessScopeConsentText}",
         "display.on.consent.screen": "true"
       }
+    },
+    {
+      "id": "4082180d-26b8-40c7-909e-b54ad31c1f94",
+      "name": "sentinel-groups-scope",
+      "protocol": "openid-connect",
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "id": "cd2d5a14-ac2f-448b-8157-9ed3e90f9d9b",
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
     },
     {
       "id": "d2626a78-f32b-4622-8f48-53f66a6889e0",
@@ -1558,14 +1623,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
+            "saml-user-attribute-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
             "saml-role-list-mapper",
+            "oidc-full-name-mapper",
+            "saml-user-property-mapper",
             "oidc-usermodel-property-mapper",
             "oidc-address-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-full-name-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper",
-            "saml-user-property-mapper"
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1632,13 +1697,13 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
-            "saml-user-attribute-mapper",
             "oidc-usermodel-attribute-mapper",
-            "saml-user-property-mapper",
-            "oidc-full-name-mapper",
-            "saml-role-list-mapper",
             "oidc-sha256-pairwise-sub-mapper",
+            "saml-user-property-mapper",
+            "saml-role-list-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-address-mapper",
+            "oidc-full-name-mapper",
             "oidc-usermodel-property-mapper"
           ]
         }
@@ -1802,26 +1867,26 @@
                 "group.name.ldap.attribute": [
                   "cn"
                 ],
-                "ignore.missing.groups": [
-                  "false"
-                ],
-                "membership.ldap.attribute": [
-                  "member"
-                ],
                 "membership.user.ldap.attribute": [
                   "uid"
+                ],
+                "ignore.missing.groups": [
+                  "false"
                 ],
                 "preserve.group.inheritance": [
                   "true"
                 ],
+                "membership.ldap.attribute": [
+                  "member"
+                ],
                 "groups.dn": [
                   "ou=groups,dc=sentinel,dc=local"
                 ],
-                "memberof.ldap.attribute": [
-                  "memberOf"
-                ],
                 "group.object.classes": [
                   "groupOfNames"
+                ],
+                "memberof.ldap.attribute": [
+                  "memberOf"
                 ],
                 "drop.non.existing.groups.during.sync": [
                   "false"
@@ -1857,20 +1922,20 @@
           ]
         },
         "config": {
-          "fullSyncPeriod": [
-            "-1"
-          ],
           "pagination": [
             "false"
+          ],
+          "fullSyncPeriod": [
+            "-1"
           ],
           "startTls": [
             "false"
           ],
-          "connectionPooling": [
-            "false"
-          ],
           "usersDn": [
             "ou=people,dc=sentinel,dc=local"
+          ],
+          "connectionPooling": [
+            "false"
           ],
           "cachePolicy": [
             "DEFAULT"
@@ -1884,17 +1949,17 @@
           "enabled": [
             "true"
           ],
-          "changedSyncPeriod": [
-            "-1"
-          ],
-          "usernameLDAPAttribute": [
-            "uid"
+          "bindDn": [
+            "cn=admin,dc=sentinel,dc=local"
           ],
           "bindCredential": [
             "${env.LDAP_ADMIN_PASSWORD:admin}"
           ],
-          "bindDn": [
-            "cn=admin,dc=sentinel,dc=local"
+          "usernameLDAPAttribute": [
+            "uid"
+          ],
+          "changedSyncPeriod": [
+            "-1"
           ],
           "lastSync": [
             "1784553116"
